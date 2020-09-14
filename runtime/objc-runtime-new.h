@@ -669,17 +669,47 @@ class list_array_tt {
         }
     }
 
+    /*
+     attachLists 传递过来的二维数组
+     
+     [[method_t,method_t,..], [method_t], [method_t,method_t],...]
+     -----------------------  ----------  -------------------
+        分类A中的方法列表A          B               C
+     addedCount = 3
+     */
     void attachLists(List* const * addedLists, uint32_t addedCount) {
         if (addedCount == 0) return;
 
         if (hasArray()) {
             // many lists -> many lists
+            // 列表中原有元素总数  假设有2个
             uint32_t oldCount = array()->count;
+            // 拼接之后的元素总数
             uint32_t newCount = oldCount + addedCount;
+            // 根据新总数重新分配内存
             setArray((array_t *)realloc(array(), array_t::byteSize(newCount)));
+            // 重新设置元素总数
             array()->count = newCount;
+            
+            /*
+             内存移动
+             [[],[],[],[原有的第一个元素],[原有的第二个元素]]
+             */
             memmove(array()->lists + addedCount, array()->lists, 
                     oldCount * sizeof(array()->lists[0]));
+            /*
+             内存拷贝
+             [
+             A ---> [addedLists中的第一个元素],
+             B ---> [addedLists中的第二个元素],
+             C ---> [addedLists中的第三个元素],
+             [原有的第一个元素],
+             [原有的第二个元素]
+             ]
+             
+             这也是分类方法会'覆盖'宿主类的方法的原因
+             消息查找的过程中是根据选择器(selector)的名称进行查找,一旦查找到对应的实现就会返回.所以分类方法会被优先实现
+             */
             memcpy(array()->lists, addedLists, 
                    addedCount * sizeof(array()->lists[0]));
         }
