@@ -1523,6 +1523,8 @@ OBJC_EXPORT void objc_setAssociatedObject(id object, const void *key, id value, 
  * @return The value associated with the key \e key for \e object.
  * 
  * @see objc_setAssociatedObject
+ *
+ * 根据 key 到 object 中获取对应的关联值
  */
 OBJC_EXPORT id objc_getAssociatedObject(id object, const void *key)
     __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_1);
